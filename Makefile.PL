@@ -9,6 +9,7 @@ WriteMakefile(
     VERSION_FROM  => 'lib/WWW/Anonymouse.pm',
     ABSTRACT_FROM => 'lib/WWW/Anonymouse.pm',
     PREREQ_PM     => {
+        'Carp'                  => 0,
         'LWP::UserAgent'        => 0,
         'Test::More'            => 0,
     },

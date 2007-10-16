@@ -5,7 +5,7 @@ use WWW::Anonymouse;
 
 {
     my $wa = eval { WWW::Anonymous->new };
-    is($wa, undef, 'attempt to instantiate virual class');
+    is($wa, undef, 'attempt to instantiate virtual class');
 }
 
 {

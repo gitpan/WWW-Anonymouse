@@ -1,26 +1,28 @@
 package WWW::Anonymouse;
 
 use strict;
+
 use LWP::UserAgent;
+use URI;
 use Carp ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant DEBUG => $ENV{ WWW_ANONYMOUSE_DEBUG } || 0;
 use constant MAX_BYTES => 3072;
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class, %params) = @_;
     if ( $class eq __PACKAGE__ ) {
         Carp::croak __PACKAGE__,
             ' is a virtual class; use the Email or News class';
     }
 
-    unless ( ref $args{ua} and $args{ua}->isa( q(LWP::UserAgent) ) ) {
-        $args{ua} = LWP::UserAgent->new( agent => __PACKAGE__.'/'.$VERSION );
+    unless ( ref $params{ua} and $params{ua}->isa( q(LWP::UserAgent) ) ) {
+        $params{ua} = LWP::UserAgent->new( agent => __PACKAGE__.'/'.$VERSION );
     }
 
-    return bless \%args, $class;
+    return bless \%params, $class;
 }
 
 sub error {
@@ -36,21 +38,21 @@ sub _ua_content_cb {
 }
 
 sub send {
-    my ($self, %args) = @_;
+    my ($self, %params) = @_;
     my %fields;
 
-    unless ( $fields{qw( to )} = $args{qw( to )} ) {
+    unless ( $fields{qw( to )} = $params{qw( to )} ) {
         $self->{error} = qq(Missing field "to");
         return;
     }
 
     for my $field ( qw( subject text ) ) {
-        $fields{$field} = $args{$field} || '';
+        $fields{$field} = $params{$field} || '';
     }
 
     my $res = $self->{ua}->post(
-        $self->_url, \%fields, Referer => $self->_referer,
-        ':read_size_hint' => MAX_BYTES, ':content_cb' => \&_ua_content_cb,
+        $self->_url, \%fields, ':read_size_hint' => MAX_BYTES,
+        ':content_cb' => \&_ua_content_cb,
     );
     unless ( $res->is_success ) {
         $self->{error} = $res->status_line;
@@ -63,7 +65,7 @@ sub send {
     my $cref = $res->content_ref;
 
     if ( $$cref !~ /<FONT size="\+2"/g ) { }
-    elsif ( $$cref =~ /\G color="#FF0000">Error - ([^>]+?)\!?</gc ) {
+    elsif ( $$cref =~ /\G color="#FF0000">(?:Mixmaster-)?Error - ([^>]+?)\!?</gc ) {
         $self->{error} = $1;
     }
     elsif ( $$cref =~ /\G>(?:Email|Posting) has been sent anonymously/ ) {
@@ -98,22 +100,22 @@ WWW::Anonymouse - interface to Anonymouse.org Email and News posting
 
 =head1 SYNOPSIS
 
-    use WWW::Anonymouse;    
+    use WWW::Anonymouse;
 
     my $an = WWW::Anonymouse::Email->new;
-    $an->send( to=>'bubba@example.com', subject=>'test', text=>'test');
+    $an->send( to=>'bubba@example.com', subject=>'test', text=>'test' );
 
     my $an = WWW::Anonymouse::News->new;
-    $an->send( to=>'alt.test', subject=>'test', text=>'test');
+    $an->send( to=>'alt.test', subject=>'test', text=>'test' );
 
 =head1 DESCRIPTION
 
-The C<WWW::Anonymouse> module provides an interface to the Anonymouse.org 
+The C<WWW::Anonymouse> module provides an interface to the Anonymouse.org
 anonymous email and news posting.
 
 =head1 METHODS
 
-=over 4
+=over
 
 =item $an = WWW::Anonymouse::Email->B<new>
 
@@ -123,7 +125,7 @@ anonymous email and news posting.
 
 =item $an = WWW::Anonymouse::News->B<new>( ua => $ua )
 
-Creates a new Email or News object. The constructor accepts an optional 
+Creates a new Email or News object. The constructor accepts an optional
 LWP::UserAgent derived object.
 
 =item $ret = $an->B<send>( to => $to, subject => $subject, text => $text )
@@ -139,8 +141,8 @@ Returns the error string, if present.
 
 =head1 NOTES
 
-Anonymouse has a flood protection limit of about 1 message per minute. If you 
-need to post more frequently, you can use http proxies or cgi proxies- but 
+Anonymouse has a flood protection limit of about 1 message per minute. If you
+need to post more frequently, you can use http proxies or cgi proxies- but
 don't abuse the service.
 
 =head1 SEE ALSO
@@ -151,9 +153,9 @@ L<http://anonymouse.org/anonnews.html>
 
 =head1 REQUESTS AND BUGS
 
-Please report any bugs or feature requests to 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Anonymouse>. I will be 
-notified, and then you'll automatically be notified of progress on your bug as 
+Please report any bugs or feature requests to
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Anonymouse>. I will be
+notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
 =head1 SUPPORT
@@ -164,7 +166,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -188,7 +190,7 @@ L<http://search.cpan.org/dist/WWW-Anonymouse>
 
 Copyright (C) 2007 gray <gray at cpan.org>, all rights reserved.
 
-This library is free software; you can redistribute it and/or modify it under 
+This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =head1 AUTHOR
