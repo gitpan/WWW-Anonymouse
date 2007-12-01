@@ -1,12 +1,13 @@
 package WWW::Anonymouse;
 
 use strict;
+use warnings;
 
 use LWP::UserAgent;
 use URI;
 use Carp ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant DEBUG => $ENV{ WWW_ANONYMOUSE_DEBUG } || 0;
 use constant MAX_BYTES => 3072;
