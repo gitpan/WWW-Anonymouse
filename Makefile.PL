@@ -1,3 +1,4 @@
+use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -12,6 +13,7 @@ WriteMakefile(
         'Carp'                  => 0,
         'LWP::UserAgent'        => 0,
         'Test::More'            => 0,
+        'URI'                   => 0,
     },
     dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean         => { FILES => 'WWW-Anonymouse-*' },

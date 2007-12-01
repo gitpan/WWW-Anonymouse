@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                WWW-Anonymouse
-version:             0.03
+version:             0.04
 abstract:            interface to Anonymouse.org Email and News posting
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36
@@ -9,6 +9,7 @@ requires:
     Carp:                          0
     LWP::UserAgent:                0
     Test::More:                    0
+    URI:                           0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.2.html
     version: 1.2
